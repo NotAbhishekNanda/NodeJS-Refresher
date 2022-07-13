@@ -1,42 +1,21 @@
 const path = require('path');
 
-const express =require('express');
+const express = require('express');
 const bodyParser = require('body-parser');
 
 const app = express();
-const adminRoutes = require('./routes/admin')
-const shopRoutes = require('./routes/shop')
 
-// At this point this will set a certain way for handling incoming request
-
-//Middleware:
-
-/*Dummy Middleware to illustrate next();
-app.use((req, res, next) => {
-    console.log('In the Middle ware');
-    next();// Allow the request to go to the next middle ware line
-});
-*/
-
-//If you are not calling next function then you should send some response 
+const adminData = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
 
 app.use(bodyParser.urlencoded({extended: false}));
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', (req, res, next) => {
-    console.log('This always runs');
-    next();
-});
-app.use('/admin', adminRoutes);
+app.use('/admin', adminData.routes);
 app.use(shopRoutes);
 
-app.use((req,res,next) => {
-    // res.status(404).send('<h1>Page not found</h1>')
-    res.status(404).sendFile(path.join(__dirname, 'views', '404.html'))
-})
-
-
-//next method allows the request to through the next middle ware.
-//use allows us to add amiddle ware function
-//It accepts an array of request handlers
+app.use((req, res, next) => {
+    res.status(404).sendFile(path.join(__dirname, 'views', '404.html'));
+});
 
 app.listen(3000);
